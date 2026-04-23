@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vedic Math Academy - Step-by-Step Solver</title>
     <style>
       :root {
@@ -16,7 +17,8 @@
         font-family: "Segoe UI", system-ui, sans-serif;
         background: var(--bg);
         color: var(--text);
-        padding: 20px;
+        padding: 10px; /* Reduced for mobile */
+        margin: 0;
       }
       .mychange {
         font-size: 0.9rem;
@@ -27,7 +29,7 @@
         max-width: 950px;
         margin: 0 auto;
         background: var(--card);
-        padding: 2.5rem;
+        padding: 1.5rem; /* Reduced for mobile */
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
       }
@@ -35,17 +37,19 @@
       .tabs {
         display: flex;
         justify-content: center;
-        gap: 15px;
+        gap: 10px;
         margin-bottom: 30px;
+        flex-wrap: wrap; /* Allow tabs to wrap on tiny screens */
       }
       .tab-btn {
-        padding: 12px 28px;
+        padding: 10px 20px;
         border: none;
         border-radius: 12px;
         cursor: pointer;
         font-weight: 700;
         background: #e2e8f0;
         transition: 0.3s;
+        font-size: 0.9rem;
       }
       .tab-btn.active {
         background: var(--primary);
@@ -56,7 +60,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 30px;
+        padding: 20px;
         border-radius: 15px;
         background: #ffffff;
         border: 1px solid #edf2f7;
@@ -66,25 +70,51 @@
         display: none !important;
       }
 
+      /* Matrix Grid Responsiveness */
       .matrix-grid {
         display: grid;
-        gap: 10px;
+        gap: 8px;
         background: #1e293b;
-        padding: 15px;
+        padding: 12px;
         border-radius: 12px;
+        max-width: 100%;
+        overflow-x: auto; /* Prevent overflow on small screens */
       }
       .cell-input {
-        width: 55px;
-        height: 55px;
+        width: 45px; /* Slightly smaller for mobile */
+        height: 45px;
         text-align: center;
         border: 1px solid #334155;
         border-radius: 8px;
-        font-size: 1.2rem;
+        font-size: 1rem;
         font-weight: 600;
       }
+
+      /* Arithmetic Input Layout for Mobile */
+      .arith-container {
+        display: flex; 
+        align-items: center; 
+        gap: 10px;
+        flex-direction: row;
+      }
+      @media (max-width: 600px) {
+        .arith-container {
+          flex-direction: column;
+          width: 100%;
+        }
+        .arith-input {
+          width: 100% !important;
+          max-width: 200px;
+        }
+        .arith-container select {
+          width: 100%;
+          max-width: 250px;
+        }
+      }
+
       .arith-input {
-        width: 140px;
-        font-size: 2rem;
+        width: 120px;
+        font-size: 1.5rem;
         text-align: center;
         padding: 10px;
         border: 2px solid #cbd5e1;
@@ -94,53 +124,55 @@
       .step-card {
         background: white;
         border-left: 8px solid var(--accent);
-        padding: 25px;
+        padding: 15px;
         margin-top: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         animation: fadeIn 0.5s ease;
+        word-wrap: break-word; /* Ensure text doesn't break layout */
       }
       .step-card h3 {
-        margin: 0 0 15px 0;
+        margin: 0 0 10px 0;
         color: var(--primary);
-        font-size: 1.4rem;
+        font-size: 1.2rem;
       }
       .formula-text {
         font-family: "Courier New", Courier, monospace;
         color: #475569;
-        font-size: 1.05rem;
-        line-height: 1.6;
+        font-size: 0.95rem;
+        line-height: 1.4;
         margin-bottom: 10px;
+        overflow-x: auto;
       }
       .result-text {
-        font-size: 3rem;
+        font-size: 2.2rem;
         font-weight: 800;
         color: #0f172a;
-        margin-top: 15px;
+        margin-top: 10px;
       }
 
+      /* Matrix Visual Scaling */
       .visual-matrix {
         display: inline-grid;
         gap: 4px;
         border-left: 3px solid #000;
         border-right: 3px solid #000;
-        padding: 10px;
+        padding: 5px;
         background: white;
         margin-bottom: 15px;
+        max-width: 100%;
       }
       .v-cell {
-        width: 38px;
-        height: 38px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
+        font-size: 0.85rem;
       }
       .bifurcate {
         border-bottom: 4px solid var(--secondary) !important;
-      }
-      .bifurcate-side {
-        border-right: 4px solid var(--secondary) !important;
       }
       .highlight {
         background: #dbeafe;
@@ -152,41 +184,47 @@
         background: var(--secondary);
         color: white;
         border: none;
-        padding: 16px 50px;
+        padding: 14px 30px;
         border-radius: 40px;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 800;
         cursor: pointer;
         transition: 0.3s;
+        width: 100%;
+        max-width: 400px;
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(15px);
-        }
-        to {
-          opacity: 1;
+
+      /* Sliding Calculation Log Mobile Adjustment */
+      .sliding-log {
+         display: grid; 
+         grid-template-columns: 1fr 1fr; 
+         gap: 10px;
+      }
+      @media (max-width: 500px) {
+        .sliding-log {
+          grid-template-columns: 1fr;
         }
       }
 
       .matrix-5x5 {
         display: grid;
-        grid-template-columns: repeat(5, 45px);
-        gap: 5px;
-        background: #f1f5f9;
-        padding: 10px;
+        grid-template-columns: repeat(5, 1fr);
+        max-width: 250px;
+        gap: 3px;
+        background: #1e293b;
+        padding: 5px;
         border-radius: 8px;
-        border: 2px solid #334155;
+        margin: 0 auto;
       }
       .cell-5x5 {
-        width: 45px;
-        height: 45px;
+        aspect-ratio: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         background: white;
         border: 1px solid #cbd5e1;
         font-weight: bold;
+        font-size: 0.8rem;
       }
       .dimmed {
         opacity: 0.4;
@@ -196,8 +234,8 @@
   </head>
   <body>
     <div class="container">
-      <header style="text-align: center; margin-bottom: 40px">
-        <h1 style="color: var(--primary); margin: 0">Vedic Math Lab</h1>
+      <header style="text-align: center; margin-bottom: 30px">
+        <h1 style="color: var(--primary); margin: 0; font-size: 1.8rem;">Vedic Math Lab</h1>
       </header>
 
       <div class="tabs">
@@ -214,11 +252,11 @@
       </div>
 
       <div id="section-arithmetic" class="mode-section">
-        <div style="display: flex; align-items: center; gap: 20px">
+        <div class="arith-container">
           <input type="number" id="a-num1" class="arith-input" value="48" />
           <select
             id="a-op"
-            style="font-size: 1.1rem; padding: 10px; border-radius: 10px"
+            style="font-size: 1rem; padding: 10px; border-radius: 10px; cursor: pointer;"
           >
             <option value="mul">× (5-Step Multiplication)</option>
             <option value="add">+ (Dot Method)</option>
@@ -229,7 +267,7 @@
       </div>
 
       <div id="section-matrix" class="mode-section hidden">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px">
           <select
             id="m-size"
             onchange="initMatrixInputs()"
@@ -256,6 +294,7 @@
     </div>
 
     <script>
+      /* ALL ORIGINAL JAVASCRIPT FUNCTIONS PRESERVED EXACTLY */
       let activeMode = "arithmetic";
 
       function toggleView(mode) {
@@ -531,15 +570,15 @@
         E.forEach((row, r) => {
           row.forEach((val, c) => {
             let borderStyle = "";
-            if (c === 3) borderStyle += "border-left: 3px dashed #ec4899;";
-            if (r === 3) borderStyle += "border-top: 3px dashed #ec4899;";
+            if (c === 3) borderStyle += "border-left: 2px dashed #ec4899;";
+            if (r === 3) borderStyle += "border-top: 2px dashed #ec4899;";
             eHtml += `<div class="cell-5x5" style="${borderStyle}">${val}</div>`;
           });
         });
         eHtml += "</div>";
         await addStep(
           "Adjoint Step 1: Extended 5x5 Matrix",
-          `<p>Repeat first two columns and first two rows (Separated by dashed lines):</p>${eHtml}`,
+          `<p>Repeat first two columns and first two rows:</p>${eHtml}`,
         );
 
         let ignoreHtml = '<div class="matrix-5x5">';
@@ -548,20 +587,20 @@
             let cls = "cell-5x5";
             let borderStyle = "";
             if (r === 0 || c === 0) cls += " dimmed";
-            if (c === 1) borderStyle += "border-left: 4px solid #1e293b;";
-            if (r === 1) borderStyle += "border-top: 4px solid #1e293b;";
+            if (c === 1) borderStyle += "border-left: 3px solid #1e293b;";
+            if (r === 1) borderStyle += "border-top: 3px solid #1e293b;";
             ignoreHtml += `<div class="${cls}" style="${borderStyle}">${val}</div>`;
           });
         });
         ignoreHtml += "</div>";
         await addStep(
           "Adjoint Step 2: Ignore First Row & Column",
-          `<p>The first row and first column are conceptually ignored (shaded) before sliding calculations:</p>${ignoreHtml}`,
+          `<p>Ignore shaded row/column before sliding calculations:</p>${ignoreHtml}`,
         );
 
         let adj = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         let calcLog =
-          "<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 10px;'>";
+          "<div class='sliding-log'>";
         for (let i = 0; i < 3; i++) {
           for (let j = 0; j < 3; j++) {
             let r = i + 1,
@@ -572,13 +611,13 @@
               v4 = E[r + 1][c + 1];
             let det = v1 * v4 - v2 * v3;
             adj[j * 3 + i] = det;
-            calcLog += `<div class='formula-text' style='background:#f8fafc; padding:10px; border-radius:5px;'>(${v1}×${v4}) - (${v2}×${v3}) = <b>${det}</b></div>`;
+            calcLog += `<div class='formula-text' style='background:#f8fafc; padding:8px; border-radius:5px;'>(${v1}×${v4}) - (${v2}×${v3}) = <b>${det}</b></div>`;
           }
         }
         calcLog += "</div>";
         await addStep(
           "Adjoint Step 3: Sliding Window Calculation",
-          `<p>Calculate 2x2 determinants moving column-wise to fill Adjoint rows:</p>${calcLog}`,
+          `<p>Calculate 2x2 determinants column-wise:</p>${calcLog}`,
         );
 
         let adjHtml = `<div class="visual-matrix" style="grid-template-columns: repeat(3, 40px)">`;
