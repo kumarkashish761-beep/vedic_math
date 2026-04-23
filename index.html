@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Vedic Math Academy - Step-by-Step Solver</title>
+    <style>
+      :root {
+        --primary: #1e293b;
+        --secondary: #ec4899;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --accent: #f59e0b;
+        --text: #334155;
+      }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 20px;
+      }
+      .mychange {
+        font-size: 0.9rem;
+        color: var(--secondary);
+        margin-top: 5px;
+      }
+      .container {
+        max-width: 950px;
+        margin: 0 auto;
+        background: var(--card);
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      }
+
+      .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      .tab-btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        background: #e2e8f0;
+        transition: 0.3s;
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .mode-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px;
+        border-radius: 15px;
+        background: #ffffff;
+        border: 1px solid #edf2f7;
+        margin-bottom: 20px;
+      }
+      .hidden {
+        display: none !important;
+      }
+
+      .matrix-grid {
+        display: grid;
+        gap: 10px;
+        background: #1e293b;
+        padding: 15px;
+        border-radius: 12px;
+      }
+      .cell-input {
+        width: 55px;
+        height: 55px;
+        text-align: center;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+      .arith-input {
+        width: 140px;
+        font-size: 2rem;
+        text-align: center;
+        padding: 10px;
+        border: 2px solid #cbd5e1;
+        border-radius: 12px;
+      }
+
+      .step-card {
+        background: white;
+        border-left: 8px solid var(--accent);
+        padding: 25px;
+        margin-top: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        animation: fadeIn 0.5s ease;
+      }
+      .step-card h3 {
+        margin: 0 0 15px 0;
+        color: var(--primary);
+        font-size: 1.4rem;
+      }
+      .formula-text {
+        font-family: "Courier New", Courier, monospace;
+        color: #475569;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+      .result-text {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 15px;
+      }
+
+      .visual-matrix {
+        display: inline-grid;
+        gap: 4px;
+        border-left: 3px solid #000;
+        border-right: 3px solid #000;
+        padding: 10px;
+        background: white;
+        margin-bottom: 15px;
+      }
+      .v-cell {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .bifurcate {
+        border-bottom: 4px solid var(--secondary) !important;
+      }
+      .bifurcate-side {
+        border-right: 4px solid var(--secondary) !important;
+      }
+      .highlight {
+        background: #dbeafe;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+
+      .solve-btn {
+        background: var(--secondary);
+        color: white;
+        border: none;
+        padding: 16px 50px;
+        border-radius: 40px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .matrix-5x5 {
+        display: grid;
+        grid-template-columns: repeat(5, 45px);
+        gap: 5px;
+        background: #f1f5f9;
+        padding: 10px;
+        border-radius: 8px;
+        border: 2px solid #334155;
+      }
+      .cell-5x5 {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid #cbd5e1;
+        font-weight: bold;
+      }
+      .dimmed {
+        opacity: 0.4;
+        background: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header style="text-align: center; margin-bottom: 40px">
+        <h1 style="color: var(--primary); margin: 0">Vedic Math Lab</h1>
+      </header>
+
+      <div class="tabs">
+        <button
+          id="tab-arith"
+          class="tab-btn active"
+          onclick="toggleView('arithmetic')"
+        >
+          Arithmetic
+        </button>
+        <button id="tab-matrix" class="tab-btn" onclick="toggleView('matrix')">
+          Vedic Matrix
+        </button>
+      </div>
+
+      <div id="section-arithmetic" class="mode-section">
+        <div style="display: flex; align-items: center; gap: 20px">
+          <input type="number" id="a-num1" class="arith-input" value="48" />
+          <select
+            id="a-op"
+            style="font-size: 1.1rem; padding: 10px; border-radius: 10px"
+          >
+            <option value="mul">× (5-Step Multiplication)</option>
+            <option value="add">+ (Dot Method)</option>
+            <option value="sub">- (Vinculum Method)</option>
+          </select>
+          <input type="number" id="a-num2" class="arith-input" value="35" />
+        </div>
+      </div>
+
+      <div id="section-matrix" class="mode-section hidden">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+          <select
+            id="m-size"
+            onchange="initMatrixInputs()"
+            style="padding: 10px; border-radius: 10px"
+          >
+            <option value="2">2x2 Matrix</option>
+            <option value="3">3x3 Matrix</option>
+            <option value="4">4x4 Matrix</option>
+          </select>
+          <select id="m-op" style="padding: 10px; border-radius: 10px">
+            <option value="det">Find Determinant</option>
+            <option value="adj">Find Adjoint</option>
+          </select>
+        </div>
+        <div id="m-input-container" class="matrix-grid"></div>
+      </div>
+
+      <div style="text-align: center">
+        <button class="solve-btn" onclick="executeSolver()">
+          Solve & Visualise Steps
+        </button>
+      </div>
+      <div id="solution-display"></div>
+    </div>
+
+    <script>
+      let activeMode = "arithmetic";
+
+      function toggleView(mode) {
+        activeMode = mode;
+        document
+          .getElementById("tab-arith")
+          .classList.toggle("active", mode === "arithmetic");
+        document
+          .getElementById("tab-matrix")
+          .classList.toggle("active", mode === "matrix");
+        document
+          .getElementById("section-arithmetic")
+          .classList.toggle("hidden", mode !== "arithmetic");
+        document
+          .getElementById("section-matrix")
+          .classList.toggle("hidden", mode !== "matrix");
+        if (mode === "matrix") initMatrixInputs();
+        document.getElementById("solution-display").innerHTML = "";
+      }
+
+      function initMatrixInputs() {
+        const size = parseInt(document.getElementById("m-size").value);
+        const container = document.getElementById("m-input-container");
+        container.style.gridTemplateColumns = `repeat(${size}, 55px)`;
+        container.innerHTML = "";
+        for (let i = 0; i < size * size; i++) {
+          container.innerHTML += `<input type="number" id="m-cell-${i}" class="cell-input" value="${Math.floor(Math.random() * 9) + 1}">`;
+        }
+      }
+
+      async function addStep(title, content) {
+        const display = document.getElementById("solution-display");
+        const card = document.createElement("div");
+        card.className = "step-card";
+        card.innerHTML = `<h3>${title}</h3><div>${content}</div>`;
+        display.appendChild(card);
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+        await new Promise((r) => setTimeout(r, 800));
+      }
+
+      function drawMatrix(data, size, highlightRows = [], bifurRow = -1) {
+        let html = `<div class="visual-matrix" style="grid-template-columns: repeat(${size}, 38px)">`;
+        data.forEach((val, i) => {
+          const r = Math.floor(i / size);
+          let cls = "v-cell" + (highlightRows.includes(r) ? " highlight" : "");
+          if (r === bifurRow) cls += " bifurcate";
+          html += `<div class="${cls}">${val}</div>`;
+        });
+        return html + "</div>";
+      }
+
+      async function executeSolver() {
+        document.getElementById("solution-display").innerHTML = "";
+        const nSize = +document.getElementById("m-size").value;
+        const mOp = document.getElementById("m-op").value;
+        const data = [];
+        if (activeMode === "matrix") {
+          for (let i = 0; i < nSize * nSize; i++)
+            data.push(+document.getElementById(`m-cell-${i}`).value || 0);
+        }
+
+        if (activeMode === "arithmetic") {
+          const n1 = +document.getElementById("a-num1").value;
+          const n2 = +document.getElementById("a-num2").value;
+          const op = document.getElementById("a-op").value;
+          if (op === "mul") await solveVedicMul5Steps(n1, n2);
+          else if (op === "add") await solveVedicAddDot(n1, n2);
+          else await solveVedicSubVinculum(n1, n2);
+        } else {
+          if (mOp === "det") {
+            if (nSize === 2) await solveVedicDet2x2(data);
+            else if (nSize === 3) await solveVedicDet3x3(data);
+            else if (nSize === 4) await solveVedicDet4x4(data);
+          } else {
+            if (nSize === 2) await solveVedicAdjoint2x2(data);
+            else if (nSize === 3) await solveVedicAdjoint3x3(data);
+            else
+              await addStep("Note", "Adjoint for 4x4 is not yet implemented.");
+          }
+        }
+      }
+
+      async function solveVedicMul5Steps(n1, n2) {
+        const a = Math.floor(n1 / 10), b = n1 % 10;
+        const c = Math.floor(n2 / 10), d = n2 % 10;
+
+        await addStep(
+          "Step 1: Vertical (Right)",
+          `<div class="formula-text">${b} × ${d} = <b>${b * d}</b></div>
+           <p>Write down ${(b * d) % 10} and carry over ${Math.floor((b * d) / 10)}.</p>`
+        );
+
+        const cross = a * d + b * c;
+        await addStep(
+          "Step 2: Crosswise",
+          `<div class="formula-text">(${a} × ${d}) + (${b} × ${c}) = ${a * d} + ${b * c} = <b>${cross}</b></div>
+           <p>Add carry: ${cross} + ${Math.floor((b * d) / 10)} = <b>${cross + Math.floor((b * d) / 10)}</b></p>`
+        );
+
+        await addStep(
+          "Step 3: Vertical (Left)",
+          `<div class="formula-text">${a} × ${c} = <b>${a * c}</b></div>
+           <p>Add previous carry to get the final leftmost digits.</p>`
+        );
+
+        await addStep(
+          "Step 4: Final Result",
+          `<div class="result-text">${n1 * n2}</div>`
+        );
+      }
+
+      async function solveVedicAddDot(n1, n2) {
+        const s1 = n1.toString().padStart(Math.max(n1.toString().length, n2.toString().length), '0');
+        const s2 = n2.toString().padStart(s1.length, '0');
+        
+        await addStep("Vedic Dot Method (Shudh)", "Add columns from Right to Left. When the sum reaches 10, mark a 'Dot' as a carry for the next column.");
+
+        let carry = 0;
+        let resultStr = "";
+        for (let i = s1.length - 1; i >= 0; i--) {
+          const d1 = parseInt(s1[i]);
+          const d2 = parseInt(s2[i]);
+          const sum = d1 + d2 + carry;
+          
+          let stepContent = `<div class="formula-text">Column ${s1.length - i}: ${d1} + ${d2} ${carry > 0 ? '(+ dot carry 1)' : ''} = <b>${sum}</b></div>`;
+          if (sum >= 10) {
+            stepContent += `<p>Sum ≥ 10. Place a <b>Dot</b> on the left column and record the remainder <b>${sum % 10}</b></p>`;
+            carry = 1;
+          } else {
+            stepContent += `<p>Sum < 10. Record <b>${sum}</b>, no carry for next column.</p>`;
+            carry = 0;
+          }
+          await addStep(`Processing Column ${s1.length - i}`, stepContent);
+          resultStr = (sum % 10) + resultStr;
+        }
+
+        if (carry > 0) resultStr = carry + resultStr;
+        await addStep("Final Sum Result", `<div class="result-text">${resultStr}</div>`);
+      }
+
+      async function solveVedicSubVinculum(n1, n2) {
+        await addStep("Vedic Subtraction (Nikhilam)", "Using 'All from 9 and last from 10' for complements when borrowing is needed.");
+        
+        const res = n1 - n2;
+        await addStep(
+          "Step 1: Column Analysis",
+          `<div class="formula-text">Subtracting ${n2} from ${n1} column by column.</div>
+           <p>Apply vinculum (negative digits) or Nikhilam sutra where necessary.</p>`
+        );
+
+        await addStep(
+          "Step 2: Normalization",
+          `<div class="formula-text">Converting vinculum numbers back to normal form.</div>`
+        );
+
+        await addStep("Final Result", `<div class="result-text">${res}</div>`);
+      }
+
+      async function solveVedicDet2x2(data) {
+        const res = data[0] * data[3] - data[1] * data[2];
+        await addStep(
+          "Step 1: Cross Multiplication",
+          `(${data[0]}×${data[3]}) - (${data[1]}×${data[2]})`,
+        );
+        await addStep("Final Result", `<div class="result-text">${res}</div>`);
+      }
+
+      async function solveVedicDet3x3(data) {
+        const m48 = data[4] * data[8],
+          m75 = data[7] * data[5];
+        const m38 = data[3] * data[8],
+          m65 = data[6] * data[5];
+        const m37 = data[3] * data[7],
+          m64 = data[6] * data[4];
+
+        const d23 = m48 - m75;
+        const d13 = m38 - m65;
+        const d12 = m37 - m64;
+
+        const res = data[0] * d23 - data[1] * d13 + data[2] * d12;
+
+        await addStep("Step 1: Row Bifurcation", drawMatrix(data, 3, [0], 0));
+        await addStep(
+          "Step 2: Calculate Minors (Full Calculation)",
+          `<div class='formula-text'>
+                Minor(2,3): (${data[4]}×${data[8]}) - (${data[7]}×${data[5]}) = ${m48} - ${m75} = <b>${d23}</b><br>
+                Minor(1,3): (${data[3]}×${data[8]}) - (${data[6]}×${data[5]}) = ${m38} - ${m65} = <b>${d13}</b><br>
+                Minor(1,2): (${data[3]}×${data[7]}) - (${data[6]}×${data[4]}) = ${m37} - ${m64} = <b>${d12}</b>
+            </div>`,
+        );
+        await addStep(
+          "Step 3: Final Result",
+          `<div class='formula-text'>${data[0]}(${d23}) - ${data[1]}(${d13}) + ${data[2]}(${d12})</div><div class="result-text">${res}</div>`,
+        );
+      }
+
+      async function solveVedicDet4x4(data) {
+        const get2x2 = (r1, r2, c1, c2) => {
+          const val1 = data[r1 * 4 + c1], val2 = data[r2 * 4 + c2];
+          const val3 = data[r1 * 4 + c2], val4 = data[r2 * 4 + c1];
+          return {
+            val: val1 * val2 - val3 * val4,
+            calc: `(${val1}×${val2} - ${val3}×${val4})`
+          };
+        };
+
+        const cols = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+        let T_details = cols.map((p) => get2x2(0, 1, p[0], p[1]));
+        let B_details = cols.map((p) => get2x2(2, 3, p[0], p[1]));
+
+        let T = T_details.map(d => d.val);
+        let B = B_details.map(d => d.val);
+
+        const res = T[0] * B[5] - T[1] * B[4] + T[2] * B[3] + T[3] * B[2] - T[4] * B[1] + T[5] * B[0];
+
+        await addStep(
+          "Step 1: Row Separation",
+          `<p>Separate the matrix into two 2x4 parts by a line:</p>${drawMatrix(data, 4, [], 1)}`,
+        );
+
+        let step2Content = cols.map((p, i) => {
+          return `<div style="margin-bottom:10px;">
+            <b>Pair(${p[0] + 1},${p[1] + 1}):</b><br>
+            Top: ${T_details[i].calc} = <b>${T[i]}</b><br>
+            Bot: ${B_details[i].calc} = <b>${B[i]}</b>
+          </div>`;
+        }).join("");
+
+        await addStep("Step 2: Column Pair Minors Calculation", step2Content);
+
+        let expansionText = `
+          <div class='formula-text'>
+            Determinant = (T1×B6) - (T2×B5) + (T3×B4) + (T4×B3) - (T5×B2) + (T6×B1)<br><br>
+            = (${T[0]}×${B[5]}) - (${T[1]}×${B[4]}) + (${T[2]}×${B[3]}) + (${T[3]}×${B[2]}) - (${T[4]}×${B[1]}) + (${T[5]}×${B[0]})<br>
+            = ${T[0] * B[5]} - ${T[1] * B[4]} + ${T[2] * B[3]} + ${T[3] * B[2]} - ${T[4] * B[1]} + ${T[5] * B[0]}
+          </div>
+          <div class="result-text">${res}</div>`;
+
+        await addStep("Step 3: Final Calculation", expansionText);
+      }
+
+      async function solveVedicAdjoint2x2(data) {
+        await addStep(
+          "Vedic Method (2x2 Adjoint)",
+          "Step 1: Swap principal diagonal elements (a11 ↔ a22)<br>Step 2: Change signs of secondary diagonal elements (a12, a21)",
+        );
+        let adj = [data[3], -data[1], -data[2], data[0]];
+        let html = `<div class="visual-matrix" style="grid-template-columns: repeat(2, 40px)">`;
+        adj.forEach(
+          (v) => (html += `<div class="v-cell highlight">${v}</div>`),
+        );
+        await addStep("Adjoint Matrix Result", html + "</div>");
+      }
+
+      async function solveVedicAdjoint3x3(data) {
+        let E = [];
+        for (let r = 0; r < 3; r++) {
+          E.push([
+            data[r * 3],
+            data[r * 3 + 1],
+            data[r * 3 + 2],
+            data[r * 3],
+            data[r * 3 + 1],
+          ]);
+        }
+        E.push([...E[0]]);
+        E.push([...E[1]]);
+
+        let eHtml = '<div class="matrix-5x5">';
+        E.forEach((row, r) => {
+          row.forEach((val, c) => {
+            let borderStyle = "";
+            if (c === 3) borderStyle += "border-left: 3px dashed #ec4899;";
+            if (r === 3) borderStyle += "border-top: 3px dashed #ec4899;";
+            eHtml += `<div class="cell-5x5" style="${borderStyle}">${val}</div>`;
+          });
+        });
+        eHtml += "</div>";
+        await addStep(
+          "Adjoint Step 1: Extended 5x5 Matrix",
+          `<p>Repeat first two columns and first two rows (Separated by dashed lines):</p>${eHtml}`,
+        );
+
+        let ignoreHtml = '<div class="matrix-5x5">';
+        E.forEach((row, r) => {
+          row.forEach((val, c) => {
+            let cls = "cell-5x5";
+            let borderStyle = "";
+            if (r === 0 || c === 0) cls += " dimmed";
+            if (c === 1) borderStyle += "border-left: 4px solid #1e293b;";
+            if (r === 1) borderStyle += "border-top: 4px solid #1e293b;";
+            ignoreHtml += `<div class="${cls}" style="${borderStyle}">${val}</div>`;
+          });
+        });
+        ignoreHtml += "</div>";
+        await addStep(
+          "Adjoint Step 2: Ignore First Row & Column",
+          `<p>The first row and first column are conceptually ignored (shaded) before sliding calculations:</p>${ignoreHtml}`,
+        );
+
+        let adj = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let calcLog =
+          "<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 10px;'>";
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            let r = i + 1,
+              c = j + 1;
+            let v1 = E[r][c],
+              v2 = E[r][c + 1],
+              v3 = E[r + 1][c],
+              v4 = E[r + 1][c + 1];
+            let det = v1 * v4 - v2 * v3;
+            adj[j * 3 + i] = det;
+            calcLog += `<div class='formula-text' style='background:#f8fafc; padding:10px; border-radius:5px;'>(${v1}×${v4}) - (${v2}×${v3}) = <b>${det}</b></div>`;
+          }
+        }
+        calcLog += "</div>";
+        await addStep(
+          "Adjoint Step 3: Sliding Window Calculation",
+          `<p>Calculate 2x2 determinants moving column-wise to fill Adjoint rows:</p>${calcLog}`,
+        );
+
+        let adjHtml = `<div class="visual-matrix" style="grid-template-columns: repeat(3, 40px)">`;
+        adj.forEach(
+          (v) => (adjHtml += `<div class="v-cell highlight">${v}</div>`),
+        );
+        await addStep("Final Adjoint (A) <br><p class = 'mychange'>Interchanging Rows and Columns</p>", adjHtml + "</div>");
+      }
+    </script>
+  </body>
+</html>
